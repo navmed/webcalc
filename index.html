@@ -183,14 +183,7 @@
 		{
 			op = e.key
 			event.preventDefault()
-			
-			// if(shouldCalcOnOp)
-			// {
-			// 	console.log("val2: ", val2)
-			// 	val2 = parseFloat(entry.value)
-			// 	calculate()
-			// 	shouldCalcOnOp = false
-			// }
+
 			if(a === null || useAnsAsVal1)
 			{
 				a = parseFloat(entry.value)
@@ -219,31 +212,7 @@
 			shouldCalcOnOp = false
 			useAnsAsVal1 = true
 		}
-		// else if("0123456789.".includes(e.key))
-		// {
-		// 	if(!shouldCalcOnOp)
-		// 		entry.value = ""
-		// 	shouldCalcOnOp = true
-		// }
-		// else if("+-*/".includes(e.key))
-		// {
-		// 	event.preventDefault()
-		// 	op = e.key
-		// 	a = b
-		// 	b = parseFloat( entry.value )
-		// 	if(a != null && shouldCalcOnOp)
-		// 	{
-		// 		calculate()
-		// 		shouldCalcOnOp = false
-		// 	}
-		// 	else{
-		// 		entry.value = ""
-		// 	}
-		// }
-		// else if("=".includes(e.key) || e.key == "Enter")
-		// {
 
-		// }
 		else
 		{
 			event.preventDefault()
