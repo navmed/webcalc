@@ -160,7 +160,7 @@
 
 	function keyEvent(e)
 	{
-		//console.log(e)
+		console.log(e)
 		if(e.key == 'Backspace' || e.key == 'Delete')
 		{
 			// do default action
@@ -212,7 +212,24 @@
 			shouldCalcOnOp = false
 			useAnsAsVal1 = true
 		}
+		else if( "%".includes(e.key) )
+		{
+			event.preventDefault()
+			if(!op)
+				entry.value = "0"
 
+			let perc = parseFloat(entry.value)
+			let calculatedPerc = perc/100
+			
+			if("+-".includes(op))	// Calculate the % based on a for addition/subtraction
+				calculatedPerc = perc*a/100
+
+			console.log('calcPerc = ', calculatedPerc)
+
+
+			b = calculatedPerc
+			entry.value = b
+		}
 		else
 		{
 			event.preventDefault()
