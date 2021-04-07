@@ -39,6 +39,10 @@
 		width: 22rem;
 	}
 
+	input.entry:focus{
+		outline:#a5dac5 solid 1px;
+	}
+
 	input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button {
   		-webkit-appearance: none;
   		-moz-appearance: none;
@@ -54,6 +58,16 @@
 		border-radius: 4px;
 		height: 4.5rem;
 		font-size: 2rem;
+	}
+
+	button:focus{
+		outline: none
+	}
+
+	button:active{
+		background-color: #cde4db;
+		box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+		outline: none;
 	}
 
 	button.wide{
@@ -79,31 +93,31 @@
 
 <body>
 	<div class="main">
-		<input class="entry" >
+		<input class="entry" maxlength="12">
 		<div class="buttons">
-			<button>AC</button>
-			<button>❮</button>
-			<button>%</button>
-			<button>&#xD7;</button>
+			<button onclick="allClear()">AC</button>
+			<button onclick="backSpace()">❮</button>
+			<button onclick="calcPercentage()">%</button>
+			<button onclick="addOperation('*')">&#xD7;</button>
 
-			<button>7</button>
-			<button>8</button>
-			<button>9</button>
-			<button>÷</button>
+			<button onclick="addDigit(7)">7</button>
+			<button onclick="addDigit(8)">8</button>
+			<button onclick="addDigit(9)">9</button>
+			<button onclick="addOperation('/')">÷</button>
 
-			<button>4</button>
-			<button>5</button>
-			<button>6</button>
-			<button>-</button>
+			<button onclick="addDigit(4)">4</button>
+			<button onclick="addDigit(5)">5</button>
+			<button onclick="addDigit(6)">6</button>
+			<button onclick="addOperation('-')">-</button>
 
-			<button>1</button>
-			<button>2</button>
-			<button>3</button>
-			<button>+</button>
+			<button onclick="addDigit(1)">1</button>
+			<button onclick="addDigit(2)">2</button>
+			<button onclick="addDigit(3)">3</button>
+			<button onclick="addOperation('+')">+</button>
 
-			<button>0</button>
-			<button>.</button>
-			<button class="wide">=</button>
+			<button onclick="addDigit(0)">0</button>
+			<button onclick="addDigit('.')">.</button>
+			<button class="wide" onclick="runCalculation()">=</button>
 		</div>
 		
 	</div>
@@ -120,6 +134,12 @@
 	let shouldClear = false
 	let shouldCalcOnOp = false
 	let useAnsAsVal1 = false
+
+	function backSpace()
+	{
+		let str = entry.value
+		entry.value = str.substr(0, str.length-1)
+	}
 
 	function operate(op, a, b)
 	{
@@ -138,13 +158,22 @@
 		}
 	}
 
+	function hasDecimals(num)
+	{
+		return num % 1 != 0
+	}
+
 	function calculate()
 	{
 		console.log(`${a} ${op} ${b} = `)
 		let ans = operate(op, a, b)
 		a = ans
 		console.log(ans)
-		entry.value = ans
+
+		if( hasDecimals(a) )
+			entry.value = ans.toFixed(3)	// to keep it simple, this could be a setting later if needed
+		else
+			entry.value = ans
 		shouldClear = true
 	}
 
@@ -158,51 +187,53 @@
 		shouldCalcOnOp = false
 	}
 
-	function keyEvent(e)
+	function addDigit(digit)
 	{
-		console.log(e)
-		if(e.key == 'Backspace' || e.key == 'Delete')
+		if(shouldClear)
 		{
-			// do default action
+			entry.value = ""
+			shouldClear = false
 		}
-		else if(e.key == 'Escape')
-		{
-			allClear()
-		}
-		else if("0123456789.".includes(e.key))
-		{
-			if(shouldClear)
-			{
-				entry.value = ""
-				shouldClear = false
-			}
 
-			shouldCalcOnOp = true
-		}
-		else if("+-*/".includes(e.key))
-		{
-			op = e.key
-			event.preventDefault()
+		entry.value = entry.value + digit
+		shouldCalcOnOp = true
+	}
 
-			if(a === null || useAnsAsVal1)
-			{
-				a = parseFloat(entry.value)
-				console.log("val1: ", a)
-				entry.value = ""
-				useAnsAsVal1 = false
-			}
-			else if(b === null || shouldCalcOnOp)
-			{
-				b = parseFloat(entry.value)
-				console.log("val2: ", b)
-				calculate()
-				shouldCalcOnOp = false
-			}
-
-		}
-		else if("=".includes(e.key) || e.key == "Enter")
+	function processDigit()
+	{
+		if(shouldClear)
 		{
-			if(shouldCalcOnOp)
+			entry.value = ""
+			shouldClear = false
+		}
+
+		shouldCalcOnOp = true
+	}
+
+	function addOperation(operation)
+	{
+		op = operation
+		event.preventDefault()
+
+		if(a === null || useAnsAsVal1)
+		{
+			a = parseFloat(entry.value)
+			console.log("val1: ", a)
+			entry.value = ""
+			useAnsAsVal1 = false
+		}
+		else if(b === null || shouldCalcOnOp)
+		{
+			b = parseFloat(entry.value)
+			console.log("val2: ", b)
+			calculate()
+			shouldCalcOnOp = false
+		}
+	}
+
+	function runCalculation()
+	{
+		if(shouldCalcOnOp)
 			{
 				b = parseFloat(entry.value)
 				console.log("val2: ", b)
@@ -211,10 +242,11 @@
 			//b = null
 			shouldCalcOnOp = false
 			useAnsAsVal1 = true
-		}
-		else if( "%".includes(e.key) )
-		{
-			event.preventDefault()
+	}
+
+	function calcPercentage()
+	{
+		event.preventDefault()
 			if(!op)
 				entry.value = "0"
 
@@ -229,6 +261,34 @@
 
 			b = calculatedPerc
 			entry.value = b
+	}
+
+	function keyEvent(e)
+	{
+		console.log(e)
+		if(e.key == 'Backspace' || e.key == 'Delete' || e.key.includes('Arrow'))
+		{
+			// do default action
+		}
+		else if(e.key == 'Escape')
+		{
+			allClear()
+		}
+		else if("0123456789.".includes(e.key))
+		{
+			processDigit()
+		}
+		else if("+-*/".includes(e.key))
+		{
+			addOperation(e.key)
+		}
+		else if("=".includes(e.key) || e.key == "Enter")
+		{
+			runCalculation()
+		}
+		else if( "%".includes(e.key) )
+		{
+			calcPercentage()
 		}
 		else
 		{
