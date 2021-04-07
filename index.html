@@ -1,0 +1,254 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Web Calc</title>
+	<meta name="description" content="The simple web calculator">
+	<meta name="author" content="Naveed Ahmed">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+</head>
+
+
+<style>
+	:root {
+	--back-input: rgba(231, 241, 237, 0.49);
+	--back-button: #E7F1ED;
+	--border: #C3E7D8;
+	--back-button: #E7F1ED;
+	}
+
+	body,* { 
+		box-sizing: border-box;
+		font-family: Lato;
+	}
+
+	input.entry {
+		font-style: normal;
+		font-weight: normal;
+		font-size: 3rem;
+		text-align: right;
+		color: #000000;
+		background: var(--back-input);
+		border: 1px solid var(--border);
+		box-sizing: border-box;
+		border-radius: 4px;
+		padding: .2rem 0.4rem;
+		margin-bottom: 1rem;
+		width: 22rem;
+	}
+
+	input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button {
+  		-webkit-appearance: none;
+  		-moz-appearance: none;
+  		appearance: none;
+  		margin: 0;
+	}
+
+	button{
+		background: var(--back-button);
+		border: 1px solid var(--border);
+		box-sizing: border-box;
+		box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.07);
+		border-radius: 4px;
+		height: 4.5rem;
+		font-size: 2rem;
+	}
+
+	button.wide{
+		
+		grid-column-end: span 2;
+	}
+
+	.main{
+		width: 24rem;
+		padding: 1rem;
+	}
+
+	.buttons{
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-template-rows: auto;
+		grid-gap: 1rem;
+		grid-row-gap: 1rem;
+	}
+</style>
+
+
+
+<body>
+	<div class="main">
+		<input class="entry" >
+		<div class="buttons">
+			<button>AC</button>
+			<button>❮</button>
+			<button>%</button>
+			<button>&#xD7;</button>
+
+			<button>7</button>
+			<button>8</button>
+			<button>9</button>
+			<button>÷</button>
+
+			<button>4</button>
+			<button>5</button>
+			<button>6</button>
+			<button>-</button>
+
+			<button>1</button>
+			<button>2</button>
+			<button>3</button>
+			<button>+</button>
+
+			<button>0</button>
+			<button>.</button>
+			<button class="wide">=</button>
+		</div>
+		
+	</div>
+
+</body>
+
+<script>
+	let entry = document.querySelector('.entry')
+	entry.addEventListener('keydown', keyEvent)
+
+	let a = null
+	let b = null
+	let op = null
+	let shouldClear = false
+	let shouldCalcOnOp = false
+	let useAnsAsVal1 = false
+
+	function operate(op, a, b)
+	{
+		switch(op)
+		{
+			case '+':
+				return a+b
+			case '-':
+				return a-b
+			case '*':
+				return a*b
+			case '/':
+				return a/b
+			default:
+				console.error('invalid operation')
+		}
+	}
+
+	function calculate()
+	{
+		console.log(`${a} ${op} ${b} = `)
+		let ans = operate(op, a, b)
+		a = ans
+		console.log(ans)
+		entry.value = ans
+		shouldClear = true
+	}
+
+	function allClear()
+	{
+		a = null
+		b = null
+		op = null
+		shouldClear = false
+		entry.value = ""
+		shouldCalcOnOp = false
+	}
+
+	function keyEvent(e)
+	{
+		//console.log(e)
+		if(e.key == 'Backspace' || e.key == 'Delete')
+		{
+			// do default action
+		}
+		else if(e.key == 'Escape')
+		{
+			allClear()
+		}
+		else if("0123456789.".includes(e.key))
+		{
+			if(shouldClear)
+			{
+				entry.value = ""
+				shouldClear = false
+			}
+
+			shouldCalcOnOp = true
+		}
+		else if("+-*/".includes(e.key))
+		{
+			op = e.key
+			event.preventDefault()
+			
+			// if(shouldCalcOnOp)
+			// {
+			// 	console.log("val2: ", val2)
+			// 	val2 = parseFloat(entry.value)
+			// 	calculate()
+			// 	shouldCalcOnOp = false
+			// }
+			if(a === null || useAnsAsVal1)
+			{
+				a = parseFloat(entry.value)
+				console.log("val1: ", a)
+				entry.value = ""
+				useAnsAsVal1 = false
+			}
+			else if(b === null || shouldCalcOnOp)
+			{
+				b = parseFloat(entry.value)
+				console.log("val2: ", b)
+				calculate()
+				shouldCalcOnOp = false
+			}
+
+		}
+		else if("=".includes(e.key) || e.key == "Enter")
+		{
+			if(shouldCalcOnOp)
+			{
+				b = parseFloat(entry.value)
+				console.log("val2: ", b)
+			}
+			calculate()
+			//b = null
+			shouldCalcOnOp = false
+			useAnsAsVal1 = true
+		}
+		// else if("0123456789.".includes(e.key))
+		// {
+		// 	if(!shouldCalcOnOp)
+		// 		entry.value = ""
+		// 	shouldCalcOnOp = true
+		// }
+		// else if("+-*/".includes(e.key))
+		// {
+		// 	event.preventDefault()
+		// 	op = e.key
+		// 	a = b
+		// 	b = parseFloat( entry.value )
+		// 	if(a != null && shouldCalcOnOp)
+		// 	{
+		// 		calculate()
+		// 		shouldCalcOnOp = false
+		// 	}
+		// 	else{
+		// 		entry.value = ""
+		// 	}
+		// }
+		// else if("=".includes(e.key) || e.key == "Enter")
+		// {
+
+		// }
+		else
+		{
+			event.preventDefault()
+		}
+	}
+
+</script>
+</html>
